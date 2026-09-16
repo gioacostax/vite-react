@@ -1,0 +1,177 @@
+# Workflow for building and deploy to Cloudflare
+
+name: Deployment
+
+concurrency:
+  group: deployment
+  cancel-in-progress: true
+
+on:
+  # Trigger manually
+  workflow_dispatch:
+    inputs:
+      cloudflare-pages-branch:
+        description: 'Choose Cloudflare Pages branch:'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - preview
+
+env:
+  VITE_APP_NAME: ${{ vars.PUBLIC_APP_NAME }}
+  VITE_GITHUB_WORKFLOW_SHA: ${{ github.sha }}
+  VITE_API_URL: ${{ vars.PUBLIC_API_URL }}
+  VITE_WS_URL: ${{ vars.PUBLIC_WS_URL }}
+  SITE: ${{ vars.SITE_URL }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      # Checkout repository and submodules
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      # Setup pnpm
+      - uses: pnpm/action-setup@v6
+        name: Setup pnpm
+        with:
+          run_install: false
+
+      # Setup nodejs
+      - name: Setup nodejs
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Lint project
+      - name: Execute Lint
+        run: pnpm lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      # Checkout repository and submodules
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      # Setup pnpm
+      - uses: pnpm/action-setup@v6
+        name: Setup pnpm
+        with:
+          run_install: false
+
+      # Setup nodejs
+      - name: Setup nodejs
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Test project
+      - name: Execute Test
+        run: pnpm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      # Checkout repository and submodules
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      # Setup pnpm
+      - uses: pnpm/action-setup@v6
+        name: Setup pnpm
+        with:
+          run_install: false
+
+      # Setup nodejs
+      - name: Setup nodejs
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Execute build
+      - name: Execute Build
+        run: pnpm build --base=${{ vars.BASE_PATH }}
+
+      # Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifact
+          path: dist
+          overwrite: true
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: Cloudflare Pages (${{ github.event.inputs.cloudflare-pages-branch }})
+      url: ${{ steps.publish.outputs.deployment-url }}
+
+    steps:
+      # Download artifact
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact
+          path: artifact
+
+      # List downloaded files for debugging
+      - name: Debug - list downloaded files
+        run: ls -la artifact
+
+      # Publish artifact
+      - name: Publish
+        id: publish
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy artifact --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.event.inputs.cloudflare-pages-branch }}

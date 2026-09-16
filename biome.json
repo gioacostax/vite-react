@@ -1,0 +1,32 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
+  "extends": ["./shared/config/_biome.json"],
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              { "source": ["vitest"], "type": true },
+              { "source": ["vitest"], "type": false },
+              ":BLANK_LINE:",
+              { "source": ["react", "react/*", "react-dom", "react-dom/*"], "type": true },
+              { "source": ["react", "react/*", "react-dom", "react-dom/*"], "type": false },
+              ":BLANK_LINE:",
+              { "source": [":PACKAGE:", "!@/**", "!@shared/**", "!@public/**"], "type": true },
+              { "source": [":PACKAGE:", "!@/**", "!@shared/**", "!@public/**"], "type": false },
+              ":BLANK_LINE:",
+              { "source": ["@/**", "@shared/**", "@public/**"], "type": true },
+              { "source": ["@/**", "@shared/**", "@public/**"], "type": false },
+              ":BLANK_LINE:",
+              { "source": [":PATH:"], "type": true },
+              { "source": [":PATH:"], "type": false }
+            ],
+            "identifierOrder": "natural"
+          }
+        }
+      }
+    }
+  }
+}

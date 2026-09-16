@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <title>vite-react</title>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+
+    <style>
+      .screen-loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: oklch(20.8% 0.042 265.755);
+      }
+      .screen-loader .bar {
+        display: inline-block;
+        width: 3px;
+        height: 8px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        animation: scale-bar 1s linear infinite;
+      }
+      .screen-loader .bar:nth-child(2) {
+        height: 16px;
+        margin: 0 3px;
+        animation-delay: 0.25s;
+      }
+      .screen-loader .bar:nth-child(3) {
+        animation-delay: 0.5s;
+      }
+      @keyframes scale-bar {
+        20% {
+          transform: scaleY(1.5);
+        }
+        40% {
+          transform: scaleY(1);
+        }
+      }
+    </style>
+  </head>
+
+  <body style="margin:0">
+    <div id="root">
+      <div class="screen-loader">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+    <script src="/src/main.tsx" type="module" ></script>
+  </body>
+
+</html>

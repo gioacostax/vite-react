@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: "IBM", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, Times, serif;
+  --animate-scale-up: scale-up 1s linear infinite;
+}
+
+@keyframes scale-up {
+  20% {
+    transform: scaleY(1.5);
+  }
+  40% {
+    transform: scaleY(1);
+  }
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth text-[14px] leading-7 font-medium antialiased;
+  }
+
+  body {
+    @apply bg-alabaster-200 font-sans text-alabaster-900;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong {
+    @apply font-bold;
+  }
+
+  a.underline-link {
+    @apply text-slate-500 underline underline-offset-4;
+  }
+
+  * {
+    @apply leading-normal [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-slate-500 [&::-webkit-scrollbar-track]:bg-slate-800;
+  }
+}

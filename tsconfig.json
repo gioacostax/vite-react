@@ -1,0 +1,31 @@
+/**
+ * This file can be used to define Typescript configuration,
+ * more info in https://www.typescriptlang.org/tsconfig/
+ */
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./shared/config/_tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@public/*": [
+        "./public/*"
+      ],
+      "@shared/*": [
+        "./shared/*"
+      ]
+    },
+    "types": []
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}
